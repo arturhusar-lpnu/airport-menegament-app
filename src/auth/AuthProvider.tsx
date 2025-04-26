@@ -1,5 +1,4 @@
 import { useContext, createContext, ReactNode, useState } from "react";
-import { useNavigate } from "react-router";
 import {
   decodeToken,
   JwtPayload,
@@ -10,7 +9,7 @@ import {
 interface AuthContextType {
   token: string;
   user: JwtPayload | null;
-  loginInAction: (loginCreds: LoginCredentials) => Promise<void>;
+  logInAction: (loginCreds: LoginCredentials) => Promise<void>;
   logOut: () => void;
   signUpAction: (regCreds: RegisterCredentials) => Promise<void>;
 }
@@ -26,27 +25,30 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const [token, setToken] = useState(localStorage.getItem("token") || "");
 
-  const navigate = useNavigate();
-
-  const loginInAction = async (loginCreds: LoginCredentials) => {
-    const response = await fetch("http://localhost:3000/api/v1/auth/signin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginCreds),
-    });
-    const res = await response.json();
-    if (res.data) {
-      const resToken = res.data.token;
-      const userPayload = decodeToken(resToken);
-      setUser(userPayload);
-      setToken(resToken);
-      localStorage.setItem("token", resToken);
-      navigate("/");
-      return;
+  const logInAction = async (loginCreds: LoginCredentials) => {
+    try {
+      const response = await fetch("http://localhost:3000/api/v1/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginCreds),
+      });
+      const res = await response.json();
+      if (res.data) {
+        const resToken = res.data.token;
+        const userPayload = decodeToken(resToken);
+        setUser(userPayload);
+        setToken(resToken);
+        localStorage.setItem("token", resToken);
+        //navigate("/");
+        return;
+      }
+      //throw new Error(res.message);
+    } catch (err: any) {
+      console.log("Got an Error" + err);
+      throw new Error(err.message);
     }
-    throw new Error(res.message);
   };
 
   const signUpAction = async (regCreds: RegisterCredentials) => {
@@ -57,9 +59,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       },
       body: JSON.stringify(regCreds),
     });
-    const res = await response.json();
+    const res = await response
+      .text()
+      .then((text) => (text ? JSON.parse(text) : {}));
 
-    if (res.message) {
+    if (res?.message) {
       throw new Error(res.message || "Registration failed");
     }
     const login: LoginCredentials = {
@@ -67,7 +71,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       password: regCreds.password,
     };
 
-    await loginInAction(login);
+    await logInAction(login);
 
     return;
   };
@@ -76,12 +80,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
     setToken("");
     localStorage.removeItem("token");
-    navigate("/login");
   };
 
   return (
     <AuthContext.Provider
-      value={{ token, user, loginInAction, logOut, signUpAction }}
+      value={{ token, user, logInAction, logOut, signUpAction }}
     >
       {children}
     </AuthContext.Provider>

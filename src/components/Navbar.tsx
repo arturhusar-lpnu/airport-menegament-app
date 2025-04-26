@@ -15,7 +15,7 @@ const Navbar = () => {
 
   const { user } = auth;
   return (
-    <nav className="bg-emerald-700 border-b border-emerald-500">
+    <nav className="bg-blue-700 border-b border-blue-500 sticky top-0 z-50">
       <div className="mx-auto max-w-8xl px-2 sm:px-6 lg:px-8">
         <div className="flex h-15 items-center justify-between">
           <div className="flex items-center flex-shrink-0">
