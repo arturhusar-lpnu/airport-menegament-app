@@ -24,7 +24,7 @@ const Navbar = () => {
               <span className="text-white">LembAir</span>
             </NavLink>
           </div>
-          <div className="md:flex md:space-x-4">
+          <div className="hidden md:flex md:space-x-4">
             <NavLink to="/" className={linkClass}>
               Home
             </NavLink>

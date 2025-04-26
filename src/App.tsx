@@ -7,6 +7,7 @@ import {
 import MainLayout from "./layouts/MainLayout";
 import AuthProvider from "./auth/AuthProvider";
 import HomePage from "./pages/HomePage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
       }
     >
       <Route index element={<HomePage />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Route>
   )
 );
