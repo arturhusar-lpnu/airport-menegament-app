@@ -41,12 +41,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(userPayload);
         setToken(resToken);
         localStorage.setItem("token", resToken);
-        //navigate("/");
         return;
       }
-      //throw new Error(res.message);
     } catch (err: any) {
-      console.log("Got an Error" + err);
       throw new Error(err.message);
     }
   };

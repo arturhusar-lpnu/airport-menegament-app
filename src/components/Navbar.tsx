@@ -19,14 +19,17 @@ const Navbar = () => {
       <div className="mx-auto max-w-8xl px-2 sm:px-6 lg:px-8">
         <div className="flex h-15 items-center justify-between">
           <div className="flex items-center flex-shrink-0">
-            <NavLink to="/" className="flex flex-shrink-1 items-center mr-4">
+            <NavLink
+              to="/"
+              className="flex flex-shrink-1 items-center mr-4 gap-2"
+            >
               <img className="h-10 w-auto" src={logo} alt="Lemb Air" />
               <span className="text-white">LembAir</span>
             </NavLink>
           </div>
           <div className="hidden md:flex md:space-x-4">
             <NavLink to="/" className={linkClass}>
-              Home
+              Flights
             </NavLink>
             <NavLink to="/tickets" className={linkClass}>
               Tickets
@@ -34,19 +37,21 @@ const Navbar = () => {
             <NavLink to="/buy-ticket" className={linkClass}>
               Buy Ticket
             </NavLink>
-            {user ? (
-              (user.roles.includes(UserRoles.Admin) && (
-                <NavLink to="/shedule" className={linkClass}>
-                  Shedule
-                </NavLink>
-              ),
-              user.roles.includes(UserRoles.TerminalManager) && (
-                <NavLink to="/gates" className={linkClass}>
-                  Gates
-                </NavLink>
-              ))
-            ) : (
-              <></>
+            {user && (
+              <>
+                {user.roles.includes(UserRoles.Admin) && (
+                  <NavLink to="/shedule" className={linkClass}>
+                    Shedule
+                  </NavLink>
+                )}
+                {user.roles.includes(
+                  UserRoles.TerminalManager || UserRoles.Admin
+                ) && (
+                  <NavLink to="/gates" className={linkClass}>
+                    Gates
+                  </NavLink>
+                )}
+              </>
             )}
           </div>
           <div className="flex items-center space-x-2">
