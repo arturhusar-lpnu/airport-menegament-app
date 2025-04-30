@@ -1,7 +1,7 @@
 import { IoIosAirplane } from "react-icons/io";
 import { Hero } from "../components/Hero";
 import WeatherIcon from "../components/WeatherIcon";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const navigate = useNavigate();

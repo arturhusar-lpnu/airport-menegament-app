@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import { Flight } from "../models/flights";
 import { useAuth } from "../auth/AuthProvider";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router-dom";
 import { SeatClass, Ticket } from "../models/tickets";
+import { LiaLongArrowAltRightSolid } from "react-icons/lia";
 
 const BuyTicketPage = () => {
   const { flightId } = useParams();
   const [flight, setFlight] = useState<Flight>();
   const { token } = useAuth();
-  const navigate = useNavigate();
-
   const [ticketClass, setTicketClass] = useState<SeatClass>("economy");
   const [activeTab, setActiveTab] = useState<SeatClass>("economy");
   const [availableTickets, setAvailableTickets] = useState<
@@ -34,6 +33,30 @@ const BuyTicketPage = () => {
     null
   );
 
+  const fetchAvailableTickets = async () => {
+    try {
+      const availabilityRes = await fetch(
+        `http://localhost:3000/api/v1/tickets/details/available`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const availabilityData = await availabilityRes.json();
+
+      const data = availabilityData.find((a: any) => a.id == flightId);
+
+      if (data) {
+        setAvailableTickets({
+          business: data.available_business_seats,
+          economy: data.available_economy_seats,
+        });
+      }
+    } catch (error) {
+      toast.error("Error fetching ticket availability");
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -56,11 +79,13 @@ const BuyTicketPage = () => {
         flightResponse.scheduleTime = new Date(flightResponse.scheduleTime);
         setFlight(flightResponse);
 
-        const businessCost = flight!.flightPrices.filter(
-          (f) => f.seatClass == "business"
+        // if (!flight) throw new Error("Error: Flight has not been fetched");
+        const fl: Flight = flightResponse;
+        const businessCost = fl.flightPrices.filter(
+          (price) => price.seatClass == "business"
         )[0].price;
-        const economyCost = flight!.flightPrices.filter(
-          (f) => f.seatClass == "economy"
+        const economyCost = fl.flightPrices.filter(
+          (price) => price.seatClass == "economy"
         )[0].price;
 
         setTicketOptions({
@@ -69,18 +94,7 @@ const BuyTicketPage = () => {
         });
         setTicketPrice(economyCost); // default
 
-        const availabilityRes = await fetch(
-          `http://localhost:3000/api/v1/tickets/details/available`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const availabilityData = await availabilityRes.json();
-        const isAvailable =
-          quantity + availabilityData.ticket_count > availabilityData.seats
-            ? true
-            : false;
-        setAvailableTickets(availabilityData);
+        await fetchAvailableTickets();
       } catch (err) {
         toast.error((err as Error).message);
       }
@@ -137,7 +151,11 @@ const BuyTicketPage = () => {
       const response = await res.json();
       if (response.message) throw new Error(response.message);
 
+      setTimeout(() => {}, 10000);
+
       toast.success(`Successfully bought ${tickets.length} ticket(s)`);
+
+      await fetchAvailableTickets();
       // navigate("/my-tickets");
     } catch (error) {
       toast.error((error as Error).message);
@@ -145,62 +163,80 @@ const BuyTicketPage = () => {
   };
 
   const tabs = ["Business", "Economy"];
-
   return (
     flight && (
-      <div className="max-w-xl mx-auto p-6 space-y-6">
-        <div className="text-xl font-semibold">{flight.flightNumber}</div>
-        <div>{flight.flightName}</div>
-        <div className="text-gray-600">
-          {flight.scheduleTime.toLocaleString()}
+      <div className="flex items-start justify-center w-full min-h-[calc(100vh-64px)] bg-blue-50 p-8">
+        <div className="border-1 border-black rounded-2xl grid grid-cols-2 justify-between  mx-2xl p-6 space-y-6 w-[50vw]">
+          <div className="flex flex-col gap-6">
+            <div className="text-xl font-bold">
+              Flight {flight.flightNumber}
+            </div>
+            <div className="text-xl font-semibold flex items-center gap-4">
+              <span>{flight.flightName.split("-")[0]}</span>
+              <LiaLongArrowAltRightSolid className="text-3xl" />
+              <span>{flight.flightName.split("-")[1]}</span>
+            </div>
+            <div className="text-gray-600 text-xl">
+              Airline: {flight.airline.airlineName}
+            </div>
+            <div className="text-gray-600 text-xl">
+              Date: {flight.scheduleTime.toLocaleString()}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div className="flex space-x-4">
+              {tabs.map((tab) => {
+                const tabKey = tab.toLowerCase() as SeatClass;
+                return (
+                  <button
+                    key={tab}
+                    className={`px-4 py-2 font-medium w-full rounded ${
+                      activeTab === tabKey
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                    onClick={() => {
+                      setActiveTab(tabKey);
+                      setTicketClass(tabKey);
+                      setTicketPrice(ticketOptions[tabKey]);
+                      setQuantity(0);
+                    }}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="text-lg font-medium">Price: ${price}</div>
+            <div className="text-lg font-medium">
+              Available: {availableTickets[activeTab]} ticket
+              {availableTickets[activeTab] == 1 ? "" : "s"}
+            </div>
+
+            <div className="flex items-center gap-4">
+              <label htmlFor="quantity" className="text-lg font-medium">
+                Quantity:
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={availableTickets[activeTab]}
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value))}
+                className="border px-3 py-1 rounded w-24"
+              />
+            </div>
+
+            <button
+              onClick={initiateTicketPurchase}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+            >
+              Buy
+            </button>
+          </div>
         </div>
-
-        <div className="flex space-x-4">
-          {tabs.map((tab) => {
-            const tabKey = tab.toLowerCase() as SeatClass;
-            return (
-              <button
-                key={tab}
-                className={`px-4 py-2 font-medium rounded ${
-                  activeTab === tabKey
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 hover:bg-gray-300"
-                }`}
-                onClick={() => {
-                  setActiveTab(tabKey);
-                  setTicketClass(tabKey);
-                  setTicketPrice(ticketOptions[tabKey]);
-                }}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="text-lg font-medium">Price: ${price}</div>
-
-        <div className="flex items-center gap-4">
-          <label htmlFor="quantity" className="text-sm font-medium">
-            Quantity:
-          </label>
-          <input
-            type="number"
-            min={1}
-            max={availableTickets[activeTab]}
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value))}
-            className="border px-3 py-1 rounded w-24"
-          />
-        </div>
-
-        <button
-          onClick={initiateTicketPurchase}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
-        >
-          Buy
-        </button>
-
         {currentModalIndex !== null && (
           <TicketModal
             index={currentModalIndex}
@@ -244,7 +280,7 @@ const TicketModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 backdrop-blur-sm bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-xl w-96">
         <h2 className="text-lg font-bold mb-4">Ticket {index + 1}</h2>
         <div className="space-y-4">
@@ -258,6 +294,9 @@ const TicketModal = ({
               <option value="economy">Economy</option>
               <option value="business">Business</option>
             </select>
+            <div className="text-lg font-medium">
+              Price: ${ticketOptions[selectedClass]}
+            </div>
           </div>
           <div className="flex justify-between mt-6">
             <button

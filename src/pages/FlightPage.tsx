@@ -3,8 +3,9 @@ import { useAuth } from "../auth/AuthProvider";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import { Flight, FlightStatus, FlightType } from "../models/flights";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import { IoIosAirplane } from "react-icons/io";
+import { LiaLongArrowAltRightSolid } from "react-icons/lia";
 
 const FlightPage = () => {
   const [flight, setFlight] = useState<Flight>();
@@ -61,9 +62,13 @@ const FlightPage = () => {
   };
 
   const from =
-    flight?.type == FlightType.Arriving ? flight?.airport.cityName : "Lemberg";
+    flight?.flightType == FlightType.Arriving
+      ? flight?.airport.cityName
+      : "Lemberg";
   const to =
-    flight?.type == FlightType.Arriving ? "Lemberg" : flight?.airport.cityName;
+    flight?.flightType == FlightType.Arriving
+      ? "Lemberg"
+      : flight?.airport.cityName;
 
   return (
     <div className="flex flex-col relative min-h-[calc(100vh-64px)] bg-blue-50 p-8">
@@ -82,7 +87,12 @@ const FlightPage = () => {
         flight && (
           <div className="relative flex flex-col gap-6 bg-white rounded-xl shadow-md p-8 w-full max-w-5xl mx-auto z-20">
             <div className="text-2xl font-semibold text-gray-800 border-b pb-4">
-              {flight.flightName}
+              <div className="text-2xl font-semibold flex items-center gap-6 ">
+                <span>{flight.flightName.split("-")[0]}</span>
+                <LiaLongArrowAltRightSolid className="text-3xl" />
+                <span>{flight.flightName.split("-")[1]}</span>
+              </div>
+
               <div className="flex flex-row text-xl justify-between">
                 <span className="font-semibold mt-4 mb-1 px-2 py-1 rounded w-fit bg-gray-100 text-black">
                   Airline : {flight?.airline.airlineName}
@@ -126,9 +136,9 @@ const FlightPage = () => {
                   City: {from}
                 </span>
                 <span className="font-semibold mb-1 px-2 py-1">
-                  {flight.type === FlightType.Departing
-                    ? flight.airport.airportName
-                    : "Lemberg International Airport"}
+                  {flight.flightType === FlightType.Departing
+                    ? "Lemberg International Airport"
+                    : flight.airport.airportName}
                 </span>
               </div>
 
@@ -138,7 +148,7 @@ const FlightPage = () => {
                 </span>
                 <span className="font-semibold mb-1 px-2 py-1">City: {to}</span>
                 <span className="font-semibold mb-1 px-2 py-1">
-                  {flight.type === FlightType.Arriving
+                  {flight.flightType === FlightType.Arriving
                     ? "Lemberg International Airport"
                     : flight.airport.airportName}
                 </span>

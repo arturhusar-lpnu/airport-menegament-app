@@ -1,9 +1,8 @@
-import { DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_IMG_SRC_TYPES } from "react";
-import { SeatClass } from "./tickets";
+import { SeatClass, Ticket } from "./tickets";
 
 export interface Flight {
   id: number;
-  type: FlightType;
+  flightType: FlightType;
   scheduleTime: Date;
   status: FlightStatus;
   flightPrices: FlightPrice[];
@@ -13,6 +12,7 @@ export interface Flight {
   airline: Airline;
   airport: Airport;
   flightName: string;
+  tickets: Ticket[];
 }
 
 export interface FlightPrice {

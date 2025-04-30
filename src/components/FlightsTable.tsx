@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Flight, FlightType, FilterFlightQuery } from "../models/flights";
 import { useAuth } from "../auth/AuthProvider";
 import { buildFilterQuery } from "../flights/flights-service";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
 

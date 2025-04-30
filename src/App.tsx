@@ -3,7 +3,7 @@ import {
   createRoutesFromElements,
   Route,
   RouterProvider,
-} from "react-router";
+} from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 // import AuthProvider from "./auth/AuthProvider";
 import FlightsPage from "./pages/FlightsPage";
@@ -15,6 +15,11 @@ import FlightPage from "./pages/FlightPage";
 import HomePage from "./pages/HomePage";
 import PrivateRoute from "./auth/PrivateRoute";
 import BuyTicketPage from "./pages/BuyTicketPage";
+import TicketsBreadcrumbLayout from "./layouts/TicketsBreadcrumbLayout";
+import TerminalList from "./components/TerminalList";
+import GateList from "./components/GateList";
+import FlightList from "./components/FlightList";
+import TicketList from "./components/TicketList";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -32,6 +37,22 @@ const router = createBrowserRouter(
           element={<BuyTicketPage />}
         />
       </Route>
+
+      <Route element={<PrivateRoute />}>
+        <Route element={<TicketsBreadcrumbLayout />}>
+          <Route path="/tickets" element={<TerminalList />} />
+          <Route path="/tickets/terminal/:terminalId" element={<GateList />} />
+          <Route
+            path="/tickets/terminal/:terminalId/gate/:gateId"
+            element={<FlightList />}
+          />
+          <Route
+            path="/tickets/terminal/:terminalId/gate/:gateId/flight/:flightId"
+            element={<TicketList />}
+          />
+        </Route>
+      </Route>
+
       <Route path="/login" element={<LoginPage />} />
       <Route path="/sign-up" element={<SignUpPage />} />
       <Route path="*" element={<NotFoundPage />} />

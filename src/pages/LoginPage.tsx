@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { LoginCredentials } from "../auth/auth-service";
 import { useAuth } from "../auth/AuthProvider";
 import { toast } from "react-toastify";

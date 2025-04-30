@@ -7,7 +7,7 @@ import {
 } from "@headlessui/react";
 import { JwtPayload } from "../auth/auth-service";
 import { useAuth } from "../auth/AuthProvider";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { UserRoles } from "../models/user-roles";
 
 const Profile = ({ user }: { user: JwtPayload }) => {

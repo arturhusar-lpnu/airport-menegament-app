@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink } from "react-router-dom";
 import logo from "../assets/react.svg";
 import { useAuth } from "../auth/AuthProvider";
 import { UserRoles } from "../models/user-roles";
@@ -42,15 +42,15 @@ const Navbar = () => {
             {user && (
               <>
                 {user.roles.includes(UserRoles.Admin) && (
-                  <NavLink to="/shedule" className={linkClass}>
-                    Shedule
+                  <NavLink to="/gates" className={linkClass}>
+                    Gates
                   </NavLink>
                 )}
                 {user.roles.includes(
                   UserRoles.TerminalManager || UserRoles.Admin
                 ) && (
-                  <NavLink to="/gates" className={linkClass}>
-                    Gates
+                  <NavLink to="/tickets" className={linkClass}>
+                    Tickets
                   </NavLink>
                 )}
               </>
