@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
-import { Flight } from "../models/flights";
+import { Flight, FlightType } from "../models/flights";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { buildFilterQuery } from "../flights/flights-service";
 import { toast } from "react-toastify";
@@ -18,6 +18,7 @@ const FlightList = () => {
   const fetchData = async () => {
     const filterQuery = buildFilterQuery({
       gateId: parseInt(gateId as string),
+      type: FlightType.Departing,
     });
     const url = `http://localhost:3000/api/v1/flights?${filterQuery}`;
     setLoading(true);
