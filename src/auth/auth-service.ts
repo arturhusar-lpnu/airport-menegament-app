@@ -18,7 +18,10 @@ export interface RegisterCredentials {
   password: string;
 }
 
-export function decodeToken(token: string): JwtPayload {
+export function decodeToken(token: string): JwtPayload | undefined {
+  if (!token) {
+    return;
+  }
   const decoded = jwtDecode<JwtPayload>(token);
 
   return decoded;

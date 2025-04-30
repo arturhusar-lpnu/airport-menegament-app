@@ -4,6 +4,7 @@ import { useAuth } from "../auth/AuthProvider";
 import { UserRoles } from "../models/user-roles";
 // import LoginButton from "./LoginButton";
 import Profile from "./Profile";
+import { decodeToken } from "../auth/auth-service";
 
 const Navbar = () => {
   const linkClass = ({ isActive }: { isActive: boolean }): string =>
@@ -13,9 +14,10 @@ const Navbar = () => {
 
   const auth = useAuth();
 
-  const { user } = auth;
+  const { token } = auth;
+  const user = decodeToken(token);
   return (
-    <nav className="bg-blue-700 border-b border-blue-500 sticky top-0 z-50">
+    <nav className="bg-blue-600 border-b border-blue-400 sticky top-0 z-50">
       <div className="mx-auto max-w-8xl px-2 sm:px-6 lg:px-8">
         <div className="flex h-15 items-center justify-between">
           <div className="flex items-center flex-shrink-0">
@@ -29,14 +31,14 @@ const Navbar = () => {
           </div>
           <div className="hidden md:flex md:space-x-4">
             <NavLink to="/" className={linkClass}>
+              Home
+            </NavLink>
+            <NavLink to="/flights" className={linkClass}>
               Flights
             </NavLink>
-            <NavLink to="/tickets" className={linkClass}>
-              Tickets
-            </NavLink>
-            <NavLink to="/buy-ticket" className={linkClass}>
+            {/* <NavLink to="/buy-ticket" className={linkClass}>
               Buy Ticket
-            </NavLink>
+            </NavLink> */}
             {user && (
               <>
                 {user.roles.includes(UserRoles.Admin) && (

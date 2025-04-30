@@ -10,7 +10,7 @@ const FlightsDateInput = forwardRef<HTMLDivElement, FlightsDateInputProps>(
   ({ value, onClick }, ref) => (
     <div
       ref={ref}
-      //onClick={onClick}
+      onClick={onClick}
       className="border p-4 flex items-center justify-between w-64 cursor-pointer"
     >
       <div>

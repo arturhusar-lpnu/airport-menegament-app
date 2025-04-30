@@ -1,14 +1,23 @@
+import { DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_IMG_SRC_TYPES } from "react";
+import { SeatClass } from "./tickets";
+
 export interface Flight {
   id: number;
   type: FlightType;
   scheduleTime: Date;
   status: FlightStatus;
-  // terminal: Terminal;
+  flightPrices: FlightPrice[];
+  aircraft: Aircraft;
   flightNumber: string;
   gate: Gate;
   airline: Airline;
   airport: Airport;
   flightName: string;
+}
+
+export interface FlightPrice {
+  seatClass: SeatClass;
+  price: number;
 }
 
 export enum FlightType {
@@ -21,6 +30,19 @@ export enum FlightStatus {
   Delayed = "delayed",
   Landed = "landed",
   Cancelled = "cancelled",
+}
+
+export interface Aircraft {
+  id: number;
+  businessSeats: number;
+  economySeats: number;
+  trunkCapacity: number;
+  model: Model;
+}
+
+export interface Model {
+  id: number;
+  modelName: string;
 }
 
 export interface Terminal {
@@ -44,7 +66,7 @@ export interface Airport {
   cityName: string;
 }
 
-export interface FilterFlightQuery {
+export class FilterFlightQuery {
   type?: FlightType | null;
   status?: FlightStatus | null;
   searchName?: string | null;
