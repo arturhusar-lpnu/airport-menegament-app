@@ -1,4 +1,4 @@
-import { SeatClass, Ticket } from "./tickets";
+import { FlightSeat, SeatClass, Ticket } from "./tickets";
 
 export interface Flight {
   id: number;
@@ -13,6 +13,7 @@ export interface Flight {
   airport: Airport;
   flightName: string;
   tickets: Ticket[];
+  flightSeats: FlightSeat[];
 }
 
 export interface FlightPrice {

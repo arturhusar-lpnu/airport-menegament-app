@@ -78,7 +78,10 @@ const Profile = ({ user }: { user: JwtPayload }) => {
               active ? "bg-red-100" : ""
             }`
           }
-          onClick={logOut}
+          onClick={() => {
+            logOut();
+            navigate("/");
+          }}
         >
           Sign Out
         </MenuItem>

@@ -27,7 +27,7 @@ export type RegisteredTicket = {
   id: number;
   ticket: Ticket;
   seat: FlightSeat;
-  luggages: Luggage[];
+  luggages?: Luggage[];
 };
 
 export type Luggage = {
@@ -41,5 +41,5 @@ export type Luggage = {
 export type FlightSeat = {
   id: number;
   seatNumber: string;
-  flight: Flight;
+  flight?: Flight;
 };

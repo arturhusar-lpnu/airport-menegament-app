@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 import { RegisterCredentials } from "../auth/auth-service";
+import { MdArrowBackIosNew } from "react-icons/md";
 import { toast } from "react-toastify";
 
 const SignUpPage = () => {
@@ -37,9 +38,19 @@ const SignUpPage = () => {
         <div className="container m-auto max-w-2xl py-24">
           <div className="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0">
             <form onSubmit={handleSubmit}>
-              <h2 className="text-3xl text-center font-semibold mb-6">
-                Sign Up
-              </h2>
+              <div className="flex flex-row items-start justify-between">
+                <div className="flex flex-row hover:cursor-pointer">
+                  <MdArrowBackIosNew
+                    className="text-2xl"
+                    onClick={() => navigate("/login")}
+                    title="Go back to login"
+                  />
+                </div>
+                <h2 className="text-3xl text-center font-semibold mb-6">
+                  Sign Up
+                </h2>
+                <div></div>
+              </div>
               <div className="mb-4">
                 <label
                   htmlFor="type"
