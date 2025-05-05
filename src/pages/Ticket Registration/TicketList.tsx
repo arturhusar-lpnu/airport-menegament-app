@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { RegisteredTicket, Ticket } from "../models/tickets";
-import { useAuth } from "../auth/AuthProvider";
+import { RegisteredTicket, Ticket } from "../../models/tickets";
+import { useAuth } from "../../auth/AuthProvider";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Flight } from "../models/flights";
-import Spinner from "./Spinner";
-import RegisterTicketModal from "./RegisterTicketModal";
-import RemoveRegistrationModal from "./RemoveRegistrationModal";
+import { Flight } from "../../models/flights";
+import Spinner from "../../components/Spinner";
+import RegisterTicketModal from "../../components/Ticket Registration/RegisterTicketModal";
+import RemoveRegistrationModal from "../../components/Ticket Registration/RemoveRegistrationModal";
+import RegistrationTimer from "../../components/Ticket Registration/RegistrationTime";
 
 const TicketList = () => {
+  const [isRegistrationActive, setIsRegistrationActive] =
+    useState<boolean>(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showRemoveRegistrationModal, setRemoveRegistrationModal] =
     useState(false);
@@ -64,12 +67,79 @@ const TicketList = () => {
     }
   };
 
+  const handleTimerStart = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/v1/gates/${gateId}/start-registration`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            flightId: flightId,
+            startedAt: new Date().toISOString(),
+          }),
+        }
+      );
+
+      const response = await res.json();
+
+      if (!res.ok) {
+        throw new Error(response.message || "Failed to start registration");
+      }
+
+      if (response.id) {
+        localStorage.setItem("registrationId", response.id.toString());
+      }
+
+      const endTime = new Date(Date.now() + 15 * 60 * 1000);
+      localStorage.setItem("registrationEndTime", endTime.toISOString());
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
+
+  const handleTimerStop = async () => {
+    try {
+      const registrationId = localStorage.getItem("registrationId");
+      const res = await fetch(
+        `http://localhost:3000/api/v1/gates/${gateId}/close-registration`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            id: registrationId,
+            closedAt: new Date().toISOString(),
+          }),
+        }
+      );
+
+      const response = await res.json();
+
+      if (!res.ok) {
+        throw new Error(response.message || "Failed to stop registration");
+      }
+      localStorage.removeItem("registrationId");
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
+
   useEffect(() => {
     if (triggerFetch) {
       fetchData();
       setTriggerFetch(false);
     }
   }, [gateId, flightId, token, triggerFetch]);
+
+  const handleTimerExpire = () => {
+    setIsRegistrationActive(false);
+  };
 
   const isTicketRegistered = (ticketId: number) => {
     return registeredTickets.some((rt) => rt.ticket.id === ticketId);
@@ -90,6 +160,13 @@ const TicketList = () => {
       </h2>
 
       <div className="flex flex-col gap-4">
+        <RegistrationTimer
+          onStart={handleTimerStart}
+          onStop={handleTimerStop}
+          onExpire={handleTimerExpire}
+          isRegistrationActive={isRegistrationActive}
+          setIsRegistrationActive={setIsRegistrationActive}
+        />
         {tickets.map((ticket) => {
           const registered = isTicketRegistered(ticket.id!);
           const passengerName = ticket.passenger?.username || "Unassigned";
@@ -125,7 +202,12 @@ const TicketList = () => {
                     setTicketId(ticket.id!);
                     setShowRegisterModal(true);
                   }}
-                  className="text-blue-600 bg-blue-100 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold"
+                  disabled={!isRegistrationActive}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold ${
+                    isRegistrationActive
+                      ? "text-blue-600 bg-blue-100 hover:bg-blue-500 hover:text-white"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
                 >
                   Register
                 </button>

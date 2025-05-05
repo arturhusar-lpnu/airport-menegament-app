@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from "../../auth/AuthProvider";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { FaRegCalendarTimes } from "react-icons/fa";

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Flight, FlightType, FilterFlightQuery } from "../models/flights";
-import { useAuth } from "../auth/AuthProvider";
 import { buildFilterQuery } from "../flights/flights-service";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -18,7 +17,6 @@ const FlightsTable = ({
   setTrigerFetch: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [flights, setFlights] = useState<Flight[]>([]);
-  const { token } = useAuth();
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -31,7 +29,6 @@ const FlightsTable = ({
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       });
       const response = await res.json();
@@ -54,7 +51,7 @@ const FlightsTable = ({
     }
     fetchData();
     setTrigerFetch(false);
-  }, [triggerFetch, type, query, token]);
+  }, [triggerFetch, type, query]);
 
   const handleNavigation = (id: number) => {
     navigate(`/flights/flight/${id}`);
@@ -77,12 +74,12 @@ const FlightsTable = ({
         <div>
           {Object.keys(groupedFlights).map((date) => (
             <div key={date} className="flex flex-col gap-4">
-              <div className="flex w-auto bg-blue-400 text-2xl text-white p-4 sticky top-0 z-20">
+              <div className="flex w-auto rounded-sm bg-blue-400 text-2xl text-white p-4 sticky top-0 z-20">
                 {date}
               </div>
               {/* <h3></h3> */}
               <div className="overflow-y-auto max-h-[500px]">
-                <table className="table table-zebra w-full items-center sticky top-16 z-10">
+                <table className="table table-zebra rounded-sm w-full items-center sticky top-16 z-10">
                   <thead>
                     <tr className="bg-gray-100 h-20">
                       <th>{type === FlightType.Arriving ? "Arr" : "Dep"}</th>

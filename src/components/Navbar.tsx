@@ -43,14 +43,14 @@ const Navbar = () => {
               <>
                 {user.roles.includes(UserRoles.Admin) && (
                   <NavLink to="/gates" className={linkClass}>
-                    Gates
+                    Gates Reports{" "}
                   </NavLink>
                 )}
                 {user.roles.includes(
                   UserRoles.TerminalManager || UserRoles.Admin
                 ) && (
                   <NavLink to="/tickets" className={linkClass}>
-                    Tickets
+                    Tickets Registry
                   </NavLink>
                 )}
               </>

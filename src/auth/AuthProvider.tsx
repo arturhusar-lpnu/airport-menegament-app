@@ -35,10 +35,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         body: JSON.stringify(loginCreds),
       });
       const res = await response.json();
+
+      if (!response.ok) {
+        throw new Error(res.message);
+      }
+
       if (res.data) {
         const resToken = res.data.token;
         const userPayload = decodeToken(resToken);
-        setUser(userPayload);
+        setUser(userPayload!);
         setToken(resToken);
         localStorage.setItem("token", resToken);
         return;

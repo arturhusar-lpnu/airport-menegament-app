@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../auth/AuthProvider";
-import { Flight, FlightType } from "../models/flights";
+import { useAuth } from "../../auth/AuthProvider";
+import { Flight, FlightType } from "../../models/flights";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { buildFilterQuery } from "../flights/flights-service";
+import { buildFilterQuery } from "../../flights/flights-service";
 import { toast } from "react-toastify";
-import Spinner from "./Spinner";
+import Spinner from "../../components/Spinner";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 const FlightList = () => {

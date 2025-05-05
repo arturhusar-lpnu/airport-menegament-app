@@ -14,6 +14,17 @@ export interface Flight {
   flightName: string;
   tickets: Ticket[];
   flightSeats: FlightSeat[];
+  registrations: Registration[];
+}
+export interface Registration {
+  id: number;
+
+  registrationStatus: RegistrationStatus;
+}
+
+export enum RegistrationStatus {
+  Open = "open",
+  Closed = "closed",
 }
 
 export interface FlightPrice {
@@ -27,6 +38,7 @@ export enum FlightType {
 }
 
 export enum FlightStatus {
+  Expected = "expected",
   Scheduled = "scheduled",
   Delayed = "delayed",
   Landed = "landed",

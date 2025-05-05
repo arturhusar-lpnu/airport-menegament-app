@@ -85,20 +85,21 @@ const BuyTicketPage = () => {
 
         // if (!flight) throw new Error("Error: Flight has not been fetched");
         const fl: Flight = flightResponse;
-        const businessCost = fl.flightPrices.filter(
-          (price) => price.seatClass == "business"
-        )[0].price;
-        const economyCost = fl.flightPrices.filter(
-          (price) => price.seatClass == "economy"
-        )[0].price;
+        if (fl.flightPrices.length > 0) {
+          const businessCost = fl.flightPrices.filter(
+            (price) => price.seatClass == "business"
+          )[0].price;
+          const economyCost = fl.flightPrices.filter(
+            (price) => price.seatClass == "economy"
+          )[0].price;
 
-        setTicketOptions({
-          business: businessCost,
-          economy: economyCost,
-        });
-        setTicketPrice(economyCost); // default
-
-        await fetchAvailableTickets();
+          setTicketOptions({
+            business: businessCost,
+            economy: economyCost,
+          });
+          setTicketPrice(economyCost);
+          await fetchAvailableTickets();
+        }
       } catch (err) {
         toast.error((err as Error).message);
       }
@@ -175,77 +176,87 @@ const BuyTicketPage = () => {
   return (
     flight && (
       <div className="flex items-start justify-center w-full min-h-[calc(100vh-64px)] bg-blue-100 p-8">
-        <div className="border-1 bg-blue-50 border-black rounded-2xl grid grid-cols-2 justify-between  mx-2xl p-6 space-y-6 w-[50vw]">
-          <div className="flex flex-col gap-6">
-            <div className="text-xl font-bold">
-              Flight {flight.flightNumber}
+        {flight.flightPrices.length > 0 ? (
+          <div className="border-1 bg-blue-50 border-black rounded-2xl grid grid-cols-2 justify-between  mx-2xl p-6 space-y-6 w-[50vw]">
+            <div className="flex flex-col gap-6">
+              <div className="text-xl font-bold">
+                Flight {flight.flightNumber}
+              </div>
+              <div className="text-xl font-semibold flex items-center gap-4">
+                <span>{flight.flightName.split("-")[0]}</span>
+                <LiaLongArrowAltRightSolid className="text-3xl" />
+                <span>{flight.flightName.split("-")[1]}</span>
+              </div>
+              <div className="text-gray-600 text-xl">
+                Airline: {flight.airline.airlineName}
+              </div>
+              <div className="text-gray-600 text-xl">
+                Date: {flight.scheduleTime.toLocaleString()}
+              </div>
             </div>
-            <div className="text-xl font-semibold flex items-center gap-4">
-              <span>{flight.flightName.split("-")[0]}</span>
-              <LiaLongArrowAltRightSolid className="text-3xl" />
-              <span>{flight.flightName.split("-")[1]}</span>
-            </div>
-            <div className="text-gray-600 text-xl">
-              Airline: {flight.airline.airlineName}
-            </div>
-            <div className="text-gray-600 text-xl">
-              Date: {flight.scheduleTime.toLocaleString()}
+
+            <div className="flex flex-col gap-6">
+              <div className="flex space-x-4">
+                {tabs.map((tab) => {
+                  const tabKey = tab.toLowerCase() as SeatClass;
+                  return (
+                    <button
+                      key={tab}
+                      className={`px-4 py-2 font-medium w-full rounded ${
+                        activeTab === tabKey
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 hover:bg-gray-300"
+                      }`}
+                      onClick={() => {
+                        setActiveTab(tabKey);
+                        setTicketClass(tabKey);
+                        setTicketPrice(ticketOptions[tabKey]);
+                        setQuantity(0);
+                      }}
+                    >
+                      {tab}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="text-lg font-medium">Price: ${price}</div>
+              <div className="text-lg font-medium">
+                Available: {availableTickets[activeTab]} ticket
+                {availableTickets[activeTab] == 1 ? "" : "s"}
+              </div>
+
+              <div className="flex items-center gap-4">
+                <label htmlFor="quantity" className="text-lg font-medium">
+                  Quantity:
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={availableTickets[activeTab]}
+                  value={quantity}
+                  onChange={(e) => setQuantity(parseInt(e.target.value))}
+                  className="border px-3 py-1 rounded w-24"
+                />
+              </div>
+
+              <button
+                onClick={initiateTicketPurchase}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+              >
+                Buy
+              </button>
             </div>
           </div>
-
-          <div className="flex flex-col gap-6">
-            <div className="flex space-x-4">
-              {tabs.map((tab) => {
-                const tabKey = tab.toLowerCase() as SeatClass;
-                return (
-                  <button
-                    key={tab}
-                    className={`px-4 py-2 font-medium w-full rounded ${
-                      activeTab === tabKey
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 hover:bg-gray-300"
-                    }`}
-                    onClick={() => {
-                      setActiveTab(tabKey);
-                      setTicketClass(tabKey);
-                      setTicketPrice(ticketOptions[tabKey]);
-                      setQuantity(0);
-                    }}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="text-lg font-medium">Price: ${price}</div>
-            <div className="text-lg font-medium">
-              Available: {availableTickets[activeTab]} ticket
-              {availableTickets[activeTab] == 1 ? "" : "s"}
-            </div>
-
-            <div className="flex items-center gap-4">
-              <label htmlFor="quantity" className="text-lg font-medium">
-                Quantity:
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={availableTickets[activeTab]}
-                value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value))}
-                className="border px-3 py-1 rounded w-24"
-              />
-            </div>
-
-            <button
-              onClick={initiateTicketPurchase}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
-            >
-              Buy
-            </button>
+        ) : (
+          <div className="bg-white rounded-2xl p-10 shadow-md text-center">
+            <h2 className="text-2xl font-bold mb-2">Ticket Sales Not Open</h2>
+            <p className="text-gray-600">
+              Prices have not been set yet. Please check back later.
+            </p>
           </div>
-        </div>
+        )}
+
         {currentModalIndex !== null && (
           <TicketModal
             index={currentModalIndex}

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Passenger } from "../models/tickets";
-import { useAuth } from "../auth/AuthProvider";
+import { Passenger } from "../../models/tickets";
+import { useAuth } from "../../auth/AuthProvider";
 import { FaSearch } from "react-icons/fa";
 import { FaUser } from "react-icons/fa6";
 import { IoTicketOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { useParams } from "react-router";
-import { FlightSeat } from "../models/tickets";
+import { FlightSeat } from "../../models/tickets";
 
 type Props = {
   isOpen: boolean;

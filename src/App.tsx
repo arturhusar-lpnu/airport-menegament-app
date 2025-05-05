@@ -16,26 +16,29 @@ import HomePage from "./pages/HomePage";
 import PrivateRoute from "./auth/PrivateRoute";
 import BuyTicketPage from "./pages/BuyTicketPage";
 import TicketsBreadcrumbLayout from "./layouts/TicketsBreadcrumbLayout";
-import TerminalList from "./components/TerminalList";
-import GateList from "./components/GateList";
-import FlightList from "./components/FlightList";
-import TicketList from "./components/TicketList";
+import TerminalList from "./pages/Ticket Registration/TerminalList";
+import GateList from "./pages/Ticket Registration/GateList";
+import FlightList from "./pages/Ticket Registration/FlightList";
+import TicketList from "./pages/Ticket Registration/TicketList";
+import GatesPages from "./pages/GatesPages";
+import GateReportPage from "./pages/GateReportPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<MainLayout />}>
       <Route index element={<HomePage />} />
-      <Route element={<PrivateRoute />}>
-        <Route path="/flights" element={<FlightsPage />} />
-      </Route>
-      <Route element={<PrivateRoute />}>
-        <Route path="/flights/flight/:id" element={<FlightPage />} />
-      </Route>
+      <Route path="/flights" element={<FlightsPage />} />
+      <Route path="/flights/flight/:id" element={<FlightPage />} />
       <Route element={<PrivateRoute />}>
         <Route
           path="/tickets/:flightId/buy-ticket"
           element={<BuyTicketPage />}
         />
+      </Route>
+
+      <Route element={<PrivateRoute />}>
+        <Route path="/gates" element={<GatesPages />} />
+        <Route path="/gates/:gateId/report" element={<GateReportPage />} />
       </Route>
 
       <Route element={<PrivateRoute />}>

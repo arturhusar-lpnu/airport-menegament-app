@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import { Gate } from "../models/flights";
-import { useAuth } from "../auth/AuthProvider";
-import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { useAuth } from "../../auth/AuthProvider";
+import { Gate, Terminal } from "../../models/flights";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useParams } from "react-router";
 
-const GateList = () => {
-  const [gates, setGates] = useState<Gate[]>();
-  const location = useLocation();
+const TerminalList = () => {
+  const [terminals, setTerminals] = useState<Terminal[]>();
   const { token } = useAuth();
   const navigate = useNavigate();
-  const { terminalId } = useParams();
 
   const fetchData = async () => {
     try {
@@ -27,18 +24,20 @@ const GateList = () => {
       if (response.message)
         throw new Error(`Error fetching terminals ${response.message}`);
 
-      let gates: Gate[] = response;
-      gates = gates.filter(
-        (g) => g.terminal.terminalId == parseInt(terminalId!)
+      const data: Gate[] = response;
+
+      const gateTerminals = Array.from(
+        new Map(data.map((g) => [g.terminal.terminalId, g.terminal])).values()
       );
-      setGates(gates);
+
+      setTerminals(gateTerminals);
     } catch (error) {
       toast.error((error as Error).message);
     }
   };
 
   const handleClick = (id: number) => {
-    navigate(`${location.pathname}/gate/${id}`);
+    navigate(`/tickets/terminal/${id}`);
   };
 
   useEffect(() => {
@@ -46,20 +45,20 @@ const GateList = () => {
   }, [token]);
 
   return (
-    <div className="flex flex-col shadow-lg rounded-xl shadow-blue-500/50 bg-blue-50">
-      {gates && (
+    <div className="flex flex-col gap-10 shadow-lg rounded-xl shadow-blue-500/50 bg-blue-50">
+      {terminals && (
         <div>
-          {gates.map((g) => (
+          {terminals.map((t) => (
             <div
-              key={g.id}
+              key={t.terminalId}
               className="w-full flex flex-row border-b-10 border-b-blue-100 items-start justify-between p-6"
             >
-              <span className="text-2xl text-blue-500 font-semibold">
-                {g.gateNumber}
+              <span className="text-xl text-blue-500 font-semibold">
+                {t.terminalName}
               </span>
               <MdOutlineKeyboardArrowRight
-                className="text-4xl hover:cursor-pointer text-blue-500"
-                onClick={() => handleClick(g.id)}
+                className="text-2xl hover:cursor-pointer text-blue-500"
+                onClick={() => handleClick(t.terminalId)}
               />
             </div>
           ))}
@@ -69,4 +68,4 @@ const GateList = () => {
   );
 };
 
-export default GateList;
+export default TerminalList;
