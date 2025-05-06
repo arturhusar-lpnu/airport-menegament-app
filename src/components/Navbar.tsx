@@ -55,6 +55,15 @@ const Navbar = () => {
                 )}
               </>
             )}
+            {user && (
+              <>
+                {user.roles.includes(UserRoles.Admin) && (
+                  <NavLink to="/stats" className={linkClass}>
+                    Stats
+                  </NavLink>
+                )}
+              </>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             {user ? (

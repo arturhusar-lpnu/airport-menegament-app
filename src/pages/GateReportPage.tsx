@@ -14,6 +14,7 @@ import { GiAirplaneArrival, GiAirplaneDeparture } from "react-icons/gi";
 import WeatherIcon from "../components/WeatherIcon";
 import { RxReload } from "react-icons/rx";
 import RearrangeModal from "../components/RearrangeModal";
+import Spinner from "../components/Spinner";
 
 const GateReportPage = () => {
   const [triggerFetch, setTriggerFetch] = useState(true);
@@ -67,8 +68,10 @@ const GateReportPage = () => {
 
   const getReport = async () => {
     try {
+      const date = new Date().toISOString();
+
       const res = await fetch(
-        `http://localhost:3000/api/v1/gates/${gateId}/report?from=2025-05-03T14:45:50.000Z&to=2025-05-20T14:45:50.000Z`,
+        `http://localhost:3000/api/v1/gates/${gateId}/report?from=${date}&to=2025-05-20T14:45:50.000Z`,
         {
           method: "GET",
           headers: {
@@ -120,8 +123,9 @@ const GateReportPage = () => {
 
   const dataForTab = report?.[activeTab];
   const dates = dataForTab ? Object.keys(dataForTab) : [];
+
   return (
-    <div className="flex flex-col gap-4 p-6 space-x-2 space-y-2">
+    <div className="flex flex-col gap-6 p-6 bg-gray-50">
       <div className="flex flex-row text-xl gap-1 font-semibold text-gray-500">
         <span
           onClick={() => navigate("/gates")}
@@ -131,18 +135,18 @@ const GateReportPage = () => {
         </span>
         <span>Gate {gate?.gateNumber}</span>
       </div>
+
+      {/* Tab navigation */}
       <div className="flex justify-center space-x-8 pb-4 mb-4">
         {tabs.map((tab) => (
           <button
             key={tab.type}
-            className={`flex flex-rows items-center justify-center gap-2 px-4 py-2 font-semibold text-lg hover:cursor-pointer ${
+            className={`flex flex-row items-center hover:cursor-pointer justify-center gap-3 px-6 py-2 font-semibold text-lg rounded-md hover:bg-blue-100 hover:text-blue-500 transition-all duration-300 ${
               activeTab === tab.type
-                ? "border-b-2 border-blue-300 text-blue-300"
-                : "text-gray-500 hover:text-blue-300"
+                ? "border-b-4 border-blue-500 text-blue-500"
+                : "text-gray-500"
             }`}
-            onClick={() => {
-              setActiveTab(tab.type);
-            }}
+            onClick={() => setActiveTab(tab.type)}
           >
             {tab.icon}
             {tab.label}
@@ -150,47 +154,52 @@ const GateReportPage = () => {
         ))}
       </div>
 
-      <div className="flex flex-row items-center justify-between">
-        <div className="flex flex-row gap-4 overflow-x-auto">
+      {/* Date selection and refresh button */}
+      <div className="flex justify-between items-center">
+        <div className="flex gap-4 overflow-x-auto">
           {loadingDates ? (
-            <div>Loading Flights...</div>
+            <Spinner loading={loadingDates} />
           ) : dates.length > 0 ? (
             dates.map((date) => (
               <button
-                className={`rounded 
-                text-lg p-4 hover:cursor-pointer hover:bg-blue-700 hover:text-blue-200
-                ${
-                  date == selectedDate
+                className={`rounded px-4 py-2 text-lg font-semibold hover:bg-blue-700 hover:text-blue-200 ${
+                  date === selectedDate
                     ? "bg-blue-500 text-blue-100"
                     : "bg-gray-200 text-black"
-                }
-              `}
+                }`}
                 key={date}
                 onClick={() => setSelectedDate(date)}
               >
                 {date}
               </button>
             ))
-          ) : null}
+          ) : (
+            <div className="text-xl text-gray-600">No Available Dates</div>
+          )}
         </div>
+
         <button
-          className="rounded bg-blue-500 text-lg text-blue-100 p-4 hover:cursor-pointer hover:bg-blue-700 hover:text-blue-200"
+          className="rounded bg-blue-500 p-4 text-blue-100 hover:bg-blue-700 hover:text-blue-200"
           onClick={() => setTriggerFetch(true)}
         >
-          <RxReload className="text-blue-100" />
+          <RxReload size={24} />
         </button>
       </div>
+
+      {/* If no date selected */}
       {!loadingDates && !selectedDate && dates.length > 0 && (
-        <div className="flex text-4xl rounded bg-gray-400 min-h-52 w-full p-2 text-black items-center justify-center">
-          <span>Choose a Date</span>
+        <div className="flex justify-center items-center bg-gray-300 rounded-lg p-4 min-h-32">
+          <span className="text-2xl text-black">Choose a Date</span>
         </div>
       )}
-      {!loadingDates && !selectedDate && dates && dates.length === 0 && (
-        <div className="flex text-4xl rounded bg-gray-400 min-h-52 w-full p-2 text-black items-center justify-center">
-          <span>No Flights</span>
+      {!loadingDates && !selectedDate && dates.length === 0 && (
+        <div className="flex justify-center items-center bg-gray-300 rounded-lg p-4 min-h-32">
+          <span className="text-2xl text-black">No Flights</span>
         </div>
       )}
-      <div className="flex flex-col gap-2 overflow-y-auto">
+
+      {/* Flight details */}
+      <div className="flex flex-col gap-6">
         {selectedDate &&
           dataForTab?.[selectedDate]?.flights.map(
             (flight: Flight, idx: number) => {
@@ -202,15 +211,15 @@ const GateReportPage = () => {
               return (
                 <div
                   key={idx}
-                  className="flex flex-col rounded-md bg-blue-50 p-6"
+                  className="flex flex-col bg-white rounded-lg shadow-md p-6"
                 >
-                  <div className="flex flex-row items-start justify-between">
-                    <span className="text-xl">
-                      Flight: {flight.flightNumber} {`<${flight.flightName}>`}
+                  <div className="flex justify-between items-center">
+                    <span className="text-xl font-semibold text-blue-700">
+                      Flight: {flight.flightNumber} &lt;{flight.flightName}&gt;
                     </span>
-                    <div className="flex flex-row gap-2">
+                    <div className="flex gap-2">
                       <div
-                        className={`rounded-xl p-2 ${getStatusStyle(
+                        className={`rounded-lg px-3 py-1 ${getStatusStyle(
                           flight.status
                         )}`}
                       >
@@ -228,11 +237,11 @@ const GateReportPage = () => {
                       )}
                     </div>
                   </div>
-                  <p>
+                  <p className="text-gray-600">
                     Time: {new Date(flight.scheduleTime).toLocaleDateString()}{" "}
                     {new Date(flight.scheduleTime).toLocaleTimeString()}
                   </p>
-                  <div className="flex flex-row items-center justify-center text-black">
+                  <div className="flex items-center justify-center text-black">
                     Weather: {weather?.condition?.text}
                     <WeatherIcon givenForecast={weather} />
                   </div>
@@ -243,13 +252,11 @@ const GateReportPage = () => {
                           setSelectedFlight(flight);
                           setShowRearrange(true);
                         }}
-                        className={`rounded-md 
-                          ${
-                            shouldRearrange
-                              ? "bg-red-200 text-red-500 hover:bg-red-600 hover:text-white"
-                              : "bg-blue-500 text-blue-200 hover:bg-blue-600 hover:text-white"
-                          }
-                           p-3 hover:cursor-pointer `}
+                        className={`rounded-md hover:cursor-pointer ${
+                          shouldRearrange
+                            ? "bg-red-200 text-red-500 hover:bg-red-600 hover:text-white"
+                            : "bg-blue-500 text-blue-200 hover:bg-blue-600"
+                        } p-3`}
                       >
                         Rearrange
                       </button>
@@ -260,14 +267,13 @@ const GateReportPage = () => {
             }
           )}
       </div>
+
+      {/* Rearrange Modal */}
       {selectedFlight && (
         <RearrangeModal
           initalTime={new Date(selectedFlight!.scheduleTime).toISOString()}
           isOpen={showRearrange}
-          onClose={() => {
-            setShowRearrange(false);
-            // setTriggerFetch(true);
-          }}
+          onClose={() => setShowRearrange(false)}
           onRearrange={() => {
             setTriggerFetch(true);
             setShowRearrange(false);

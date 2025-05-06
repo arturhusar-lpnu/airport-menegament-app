@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { MdLocationOn, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { useAuth } from "../../auth/AuthProvider";
 import { Gate, Terminal } from "../../models/flights";
 import { useNavigate } from "react-router-dom";
@@ -45,25 +45,38 @@ const TerminalList = () => {
   }, [token]);
 
   return (
-    <div className="flex flex-col gap-10 shadow-lg rounded-xl shadow-blue-500/50 bg-blue-50">
-      {terminals && (
-        <div>
-          {terminals.map((t) => (
+    <div className="flex flex-col flex-1 max-w-3xl mx-auto my-8">
+      <h2 className="text-2xl font-bold text-blue-700 mb-4 flex items-center">
+        <MdLocationOn className="mr-2" /> Terminals
+      </h2>
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-blue-100">
+        {terminals &&
+          terminals.map((t) => (
             <div
               key={t.terminalId}
-              className="w-full flex flex-row border-b-10 border-b-blue-100 items-start justify-between p-6"
+              className="group hover:bg-blue-50 transition-all duration-200 border-b border-blue-100 last:border-b-0"
             >
-              <span className="text-xl text-blue-500 font-semibold">
-                {t.terminalName}
-              </span>
-              <MdOutlineKeyboardArrowRight
-                className="text-2xl hover:cursor-pointer text-blue-500"
+              <div
+                className="flex items-center justify-between p-4 cursor-pointer"
                 onClick={() => handleClick(t.terminalId)}
-              />
+              >
+                <div className="flex items-center">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                    <span className="text-blue-700 font-bold">
+                      {t.terminalId}
+                    </span>
+                  </div>
+                  <span className="text-lg text-gray-800 font-medium">
+                    {t.terminalName}
+                  </span>
+                </div>
+                <div className="bg-blue-100 rounded-full p-2 group-hover:bg-blue-500 transition-colors">
+                  <MdOutlineKeyboardArrowRight className="text-xl text-blue-500 group-hover:text-white" />
+                </div>
+              </div>
             </div>
           ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 };

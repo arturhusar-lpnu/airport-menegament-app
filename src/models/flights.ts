@@ -67,6 +67,14 @@ export interface Gate {
   id: number;
   gateNumber: string;
   terminal: Terminal;
+  flights: Flight[];
+}
+
+export interface GateWorkload {
+  gateId: number;
+  workload: number;
+  workloadPercent: number;
+  date: string;
 }
 
 export interface Airline {

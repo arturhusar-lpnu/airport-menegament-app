@@ -31,7 +31,7 @@ const TicketsBreadcrumbLayout = () => {
 
   console.log(JSON.stringify(crumbLinks));
   return (
-    <div className="p-6 bg-blue-50 w-full min-h-[calc(100vh-64px)]">
+    <div className="p-6 bg-blue-50 w-full">
       <nav className="text-lg text-gray-500 font-medium mb-4 space-x-2">
         {crumbLinks.map((crumb, idx) => (
           <span key={idx}>

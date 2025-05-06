@@ -149,7 +149,7 @@ const RegisterTicketModal = ({
 
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md overflow-y-auto">
         <h3 className="text-2xl font-bold text-blue-700 mb-6">
           Register Ticket
         </h3>

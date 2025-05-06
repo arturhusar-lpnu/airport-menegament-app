@@ -2,12 +2,13 @@ import { Flight } from "./flights";
 
 export type SeatClass = "business" | "economy";
 
-export type LuggageStatus =
-  | "boarded"
-  | "lost"
-  | "received"
-  | "to_be_received"
-  | "pending";
+export enum LuggageStatus {
+  Boarded = "boarded",
+  Received = "received",
+  ToBeReceived = "to_be_received",
+  Lost = "lost",
+  Pending = "pending",
+}
 
 export type Ticket = {
   id?: number;
@@ -27,12 +28,12 @@ export type RegisteredTicket = {
   id: number;
   ticket: Ticket;
   seat: FlightSeat;
-  luggages?: Luggage[];
+  luggage?: Luggage;
 };
 
 export type Luggage = {
   id: number;
-  weight: number;
+  weight: string;
   status: LuggageStatus;
   passenger: Passenger;
   ticket: RegisteredTicket;

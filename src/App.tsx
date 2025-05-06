@@ -22,6 +22,7 @@ import FlightList from "./pages/Ticket Registration/FlightList";
 import TicketList from "./pages/Ticket Registration/TicketList";
 import GatesPages from "./pages/GatesPages";
 import GateReportPage from "./pages/GateReportPage";
+import StatsPage from "./pages/StatsPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -54,6 +55,10 @@ const router = createBrowserRouter(
             element={<TicketList />}
           />
         </Route>
+      </Route>
+
+      <Route element={<PrivateRoute />}>
+        <Route path="stats/" element={<StatsPage />} />
       </Route>
 
       <Route path="/login" element={<LoginPage />} />

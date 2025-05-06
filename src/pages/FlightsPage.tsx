@@ -8,8 +8,6 @@ import { MdDateRange } from "react-icons/md";
 import { GiAirplaneArrival, GiAirplaneDeparture } from "react-icons/gi";
 
 const FlightsPage = () => {
-  //const { token } = useAuth();
-  //const user = decodeToken(token);
   const [activeTab, setActiveTab] = useState(FlightType.Arriving);
   const [type, setType] = useState<FlightType>(FlightType.Arriving);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -51,7 +49,7 @@ const FlightsPage = () => {
   query.searchName = searchName;
 
   return (
-    <section className="flex flex-col relative  items-center justify-center min-h-[calc(100vh-64px)] max-h-screen bg-linear-to-r/srgb from-blue-500 to-gray-300">
+    <section className="flex flex-col overflow-hidden relative items-center justify-center min-h-[calc(100vh-64px)] max-h-screen bg-gradient-to-r from-blue-500 to-gray-300">
       <img
         className="absolute inset-0 w-full h-[50vh] object-cover z-0"
         src="/images/arrivals.png"
@@ -59,17 +57,17 @@ const FlightsPage = () => {
       />
       <div className="absolute inset-0 h-[50vh] bg-black/60 z-10" />
 
-      <div className="relative container m-auto max-w-4xl px-4 md:px-0 z-20">
-        <div className="bg-white px-6 py-8 mb-4 shadow-md rounded-md border md:m-0">
+      <div className="relative container m-auto max-w-5xl px-6 py-8 z-20">
+        <div className="bg-white px-6 py-8 mb-6 rounded-xl shadow-lg border">
           {/* Tabs */}
           <div className="flex justify-center space-x-8 border-b-2 pb-4 mb-4">
             {tabs.map((tab) => (
               <button
                 key={tab.type}
-                className={`flex flex-rows items-center justify-center gap-2 px-4 py-2 font-semibold text-lg hover:cursor-pointer ${
+                className={`flex flex-row items-center justify-center gap-3 px-6 py-2 font-semibold text-lg rounded-md hover:bg-blue-100 hover:text-blue-500 transition-all duration-300 ${
                   activeTab === tab.type
-                    ? "border-b-2 border-blue-300 text-blue-300"
-                    : "text-gray-500 hover:text-blue-300"
+                    ? "border-b-4 border-blue-500 text-blue-500"
+                    : "text-gray-500"
                 }`}
                 onClick={() => {
                   setActiveTab(tab.type);
@@ -78,24 +76,24 @@ const FlightsPage = () => {
                 }}
               >
                 {tab.icon}
-                {tab.label}
+                <span>{tab.label}</span>
               </button>
             ))}
           </div>
 
           {/* Title */}
           <div className="mb-6">
-            <span className="text-xl font-semibold">
+            <span className="text-2xl font-semibold text-gray-700">
               {type === FlightType.Arriving ? "Arriving" : "Departing"} Flights
             </span>
           </div>
 
-          {/*Date and Time Pickers*/}
-          <div className="flex items-center justify-center gap-4">
-            <div className="border p-4 flex items-center justify-between w-64">
+          {/* Date and Time Pickers */}
+          <div className="flex items-center justify-between gap-6 mb-8">
+            <div className="flex items-center justify-between w-64 p-4 border rounded-xl shadow-md bg-white">
               <div>
                 <p className="text-gray-500 text-sm">Pick a date</p>
-                <p className="text-lg">
+                <p className="text-lg font-medium">
                   {selectedDate
                     ? selectedDate.toLocaleDateString()
                     : "Select date"}
@@ -112,14 +110,13 @@ const FlightsPage = () => {
                     className="text-blue-800 cursor-pointer"
                   />
                 }
-                // minDate={new Date()}
                 dateFormat="dd MMM yyyy"
               />
             </div>
-            <div className="border p-4 flex items-center justify-between w-64 relative">
+            <div className="flex items-center justify-between w-64 p-4 border rounded-xl shadow-md bg-white relative">
               <div>
-                <p className="text-gray-500 text-sm">Flights from</p>
-                <p className="text-lg">
+                <p className="text-gray-500 text-sm">Pick a time</p>
+                <p className="text-lg font-medium">
                   {selectedTime
                     ? selectedTime.toLocaleTimeString([], {
                         hour: "2-digit",
@@ -129,7 +126,7 @@ const FlightsPage = () => {
                 </p>
               </div>
               <DatePicker
-                selected={selectedDate}
+                selected={selectedTime}
                 onChange={(date) => setSelectedTime(date)}
                 popperModifiers={datepickerModifiers}
                 popperPlacement="right"
@@ -144,24 +141,24 @@ const FlightsPage = () => {
               />
             </div>
           </div>
-          {/* Search Bar */}
 
-          <div className="flex border-b mb-6 py-2 gap-4">
+          {/* Search Bar */}
+          <div className="flex items-center border-b mb-8 py-2 gap-4">
             <div className="flex flex-row w-full items-center">
               <FaSearch className="text-gray-400 mr-2" />
               <input
                 type="text"
-                placeholder="Search"
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+                placeholder="Search by flight name"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
               />
             </div>
             <button
-              className="text-white whitespace-nowrap bg-blue-500 hover:bg-blue-700 hover:text-blue-100 rounded-md px-3 py-2 cursor-pointer"
+              className="bg-blue-500 text-white hover:bg-blue-700 px-4 py-2 rounded-md transition duration-300"
               onClick={handleSearch}
             >
-              <span>Search Flights</span>
+              Search
             </button>
           </div>
 

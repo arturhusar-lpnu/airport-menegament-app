@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import AuthProvider from "./auth/AuthProvider.tsx";
 import { ToastContainer } from "react-toastify";
+import "leaflet/dist/leaflet.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

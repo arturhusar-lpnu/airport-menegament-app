@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { RegisteredTicket, Ticket } from "../../models/tickets";
+import {
+  Luggage,
+  Passenger,
+  RegisteredTicket,
+  Ticket,
+} from "../../models/tickets";
 import { useAuth } from "../../auth/AuthProvider";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -8,6 +13,8 @@ import Spinner from "../../components/Spinner";
 import RegisterTicketModal from "../../components/Ticket Registration/RegisterTicketModal";
 import RemoveRegistrationModal from "../../components/Ticket Registration/RemoveRegistrationModal";
 import RegistrationTimer from "../../components/Ticket Registration/RegistrationTime";
+import { MdAirplaneTicket, MdLuggage, MdPerson } from "react-icons/md";
+import LuggageRegistraionModal from "../../components/Ticket Registration/LuggageRegistraionModal";
 
 const TicketList = () => {
   const [isRegistrationActive, setIsRegistrationActive] =
@@ -15,6 +22,7 @@ const TicketList = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showRemoveRegistrationModal, setRemoveRegistrationModal] =
     useState(false);
+  const [showLuggaeModal, setShowLuggageModal] = useState(false);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeTicketId, setTicketId] = useState<number>(0);
   const [activeRegisteredTicketId, setActiveRegisteredTicketId] =
@@ -26,7 +34,12 @@ const TicketList = () => {
   >([]);
   const { token } = useAuth();
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedPassenger, setSelectedPassenger] = useState<Passenger>();
   const { gateId, flightId } = useParams();
+
+  const getLuggageByRegisteredTicketId = (id: number): Luggage | undefined => {
+    return registeredTickets.find((rt) => rt.id === id)?.luggage;
+  };
 
   const fetchData = async () => {
     try {
@@ -65,6 +78,41 @@ const TicketList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLuggageButtonClick = (ticketId: number) => {
+    if (!isRegistrationActive) {
+      toast.warn("Start a registration session to adjust luggage data", {
+        style: {
+          color: "white",
+          background: "black",
+          padding: "12px 16px",
+          borderRadius: "8px",
+        },
+      });
+      return;
+    }
+    getRegistered(ticketId);
+    const ticket = tickets.find((t) => t.id === ticketId);
+    setSelectedPassenger(ticket?.passenger!);
+    setShowLuggageModal(true);
+  };
+
+  const handleRemoveButtonClick = (ticketId: number) => {
+    if (!isRegistrationActive) {
+      toast.warn("Start a registration session to remove registry", {
+        style: {
+          color: "white",
+          background: "black",
+          padding: "12px 16px",
+          borderRadius: "8px",
+        },
+      });
+      return;
+    }
+
+    getRegistered(ticketId);
+    setRemoveRegistrationModal(true);
   };
 
   const handleTimerStart = async () => {
@@ -154,12 +202,17 @@ const TicketList = () => {
   if (loading || !flight) return <Spinner loading={loading} />;
 
   return (
-    <div className="flex flex-col rounded-2xl shadow-lg shadow-blue-500/50 bg-blue-50 p-4 gap-6">
-      <h2 className="text-2xl font-semibold text-blue-700 mb-2">
-        Tickets for {flight.flightNumber} - {flight.flightName}
-      </h2>
+    <div className="relative z-20 max-w-full mx-auto my-8">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-blue-100 p-6">
+        <div className="flex items-center mb-6 ">
+          <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center text-white mr-4">
+            <MdAirplaneTicket className="text-2xl" />
+          </div>
+          <h2 className="text-2xl font-bold text-blue-700">
+            Tickets for {flight.flightNumber} - {flight.flightName}
+          </h2>
+        </div>
 
-      <div className="flex flex-col gap-4">
         <RegistrationTimer
           onStart={handleTimerStart}
           onStop={handleTimerStop}
@@ -167,54 +220,103 @@ const TicketList = () => {
           isRegistrationActive={isRegistrationActive}
           setIsRegistrationActive={setIsRegistrationActive}
         />
-        {tickets.map((ticket) => {
-          const registered = isTicketRegistered(ticket.id!);
-          const passengerName = ticket.passenger?.username || "Unassigned";
-          return (
-            <div
-              key={ticket.id}
-              className="w-full flex flex-row items-center justify-between border border-blue-200 bg-white p-4 rounded-xl shadow"
-            >
-              <div className="text-blue-500 font-medium text-lg flex flex-row gap-2 items-center justify-center">
-                {registered ? (
-                  <div className="text-green-600 bg-green-100 px-4 py-2 rounded-xl text-sm font-semibold">
-                    Registered
-                  </div>
-                ) : null}
-                Class : {ticket.seatClass} Passenger: {passengerName}
-              </div>
 
-              {registered ? (
-                <div className="flex flex-row gap-4">
-                  <button
-                    onClick={() => {
-                      getRegistered(ticket.id!);
-                      setRemoveRegistrationModal(true);
-                    }}
-                    className="text-red-400 bg-red-100 px-4 py-2 rounded-xl text-sm font-semibold hover:cursor-pointer hover:bg-red-500 hover:text-white"
-                  >
-                    Remove Registration
-                  </button>
+        <div className="space-y-4 mt-6">
+          {tickets.map((ticket) => {
+            const registered = isTicketRegistered(ticket.id!);
+            const passengerName = ticket.passenger?.username || "Unassigned";
+
+            return (
+              <div
+                key={ticket.id}
+                className="bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden"
+              >
+                <div className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <div className="mb-4 sm:mb-0">
+                    <div className="flex items-center mb-2">
+                      {registered && (
+                        <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full mr-3">
+                          Registered
+                        </span>
+                      )}
+                      <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+                        {ticket.seatClass}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center text-gray-700">
+                      <MdPerson className="mr-2" />
+                      <span className="font-medium">{passengerName}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {registered ? (
+                      <>
+                        <button
+                          onClick={() => {
+                            handleLuggageButtonClick(ticket.id!);
+                            setSelectedPassenger(ticket.passenger);
+                          }}
+                          className="flex items-center justify-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"
+                        >
+                          <MdLuggage className="mr-1" />
+                          <span>Luggage</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleRemoveButtonClick(ticket.id!);
+                          }}
+                          className="flex items-center justify-center px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
+                        >
+                          <span>Remove Registration</span>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setTicketId(ticket.id!);
+                          setShowRegisterModal(true);
+                        }}
+                        disabled={!isRegistrationActive}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                          isRegistrationActive
+                            ? "bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white transition-colors"
+                            : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                        }`}
+                      >
+                        Register
+                      </button>
+                    )}
+                  </div>
                 </div>
-              ) : (
+              </div>
+            );
+          })}
+        </div>
+
+        {/* {showRegisterModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-xl font-bold mb-4">Register Ticket</h3>
+              <p>Modal content would go here</p>
+              <div className="flex justify-end mt-4">
                 <button
-                  onClick={() => {
-                    setTicketId(ticket.id!);
-                    setShowRegisterModal(true);
-                  }}
-                  disabled={!isRegistrationActive}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold ${
-                    isRegistrationActive
-                      ? "text-blue-600 bg-blue-100 hover:bg-blue-500 hover:text-white"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  }`}
+                  className="px-4 py-2 bg-gray-200 rounded-md mr-2"
+                  onClick={() => setShowRegisterModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                  onClick={() => setShowRegisterModal(false)}
                 >
                   Register
                 </button>
-              )}
+              </div>
             </div>
-          );
-        })}
+          </div>
+        )} */}
       </div>
       <RegisterTicketModal
         isOpen={showRegisterModal}
@@ -227,6 +329,16 @@ const TicketList = () => {
         onClose={() => setRemoveRegistrationModal(false)}
         registeredTicketId={activeRegisteredTicketId}
         onRemoved={() => setTriggerFetch(true)}
+      />
+      <LuggageRegistraionModal
+        gateId={parseInt(gateId!)}
+        flightId={flight.id}
+        isOpen={showLuggaeModal}
+        passenger={selectedPassenger!}
+        luggage={getLuggageByRegisteredTicketId(activeRegisteredTicketId)}
+        registeredTicketId={activeRegisteredTicketId}
+        onClose={() => setShowLuggageModal(false)}
+        onConfirm={() => setTriggerFetch(true)}
       />
     </div>
   );

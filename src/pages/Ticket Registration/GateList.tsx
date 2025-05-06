@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Gate } from "../../models/flights";
 import { useAuth } from "../../auth/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { MdLocationOn, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { toast } from "react-toastify";
 import { useParams } from "react-router";
 
@@ -46,25 +46,41 @@ const GateList = () => {
   }, [token]);
 
   return (
-    <div className="flex flex-col shadow-lg rounded-xl shadow-blue-500/50 bg-blue-50">
-      {gates && (
-        <div>
-          {gates.map((g) => (
+    <div className="max-w-lg mx-auto my-8">
+      <h2 className="text-2xl font-bold text-blue-700 mb-4 flex items-center">
+        <MdLocationOn className="mr-2" /> Gates
+      </h2>
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-blue-100">
+        {gates &&
+          gates.map((g) => (
             <div
               key={g.id}
-              className="w-full flex flex-row border-b-10 border-b-blue-100 items-start justify-between p-6"
+              className="group hover:bg-blue-50 transition-all duration-200 border-b border-blue-100 last:border-b-0"
             >
-              <span className="text-2xl text-blue-500 font-semibold">
-                {g.gateNumber}
-              </span>
-              <MdOutlineKeyboardArrowRight
-                className="text-4xl hover:cursor-pointer text-blue-500"
+              <div
+                className="flex items-center justify-between p-4 cursor-pointer"
                 onClick={() => handleClick(g.id)}
-              />
+              >
+                <div className="flex flex-row gap-2 items-center">
+                  <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                    <span className="text-white font-bold">{g.id}</span>
+                  </div>
+                  <span className="text-xl text-gray-800 font-medium">
+                    Gate: {g.gateNumber}
+                  </span>
+                </div>
+                <div className="flex flex-row gap-2 justify-center items-center">
+                  <span className="text-xl text-gray-800 font-medium">
+                    {g.flights.length} flights
+                  </span>
+                  <div className="bg-blue-100 rounded-full p-2 group-hover:bg-blue-500 transition-colors">
+                    <MdOutlineKeyboardArrowRight className="text-2xl text-blue-500 group-hover:text-white" />
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 };
